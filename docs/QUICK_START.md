@@ -1,5 +1,7 @@
 # ⚡ Inicio Rápido - Aslin 2.0
 
+> **Nota**: Esta guía es un resumen rápido. Para información completa, consulta [SETUP.md](./SETUP.md)
+
 Guía express para tener Aslin 2.0 funcionando en 5 minutos.
 
 ## 🎯 Pasos Rápidos
@@ -165,9 +167,9 @@ make status         # Ver estado de servicios
 
 Para información detallada, consulta:
 
-- **[SETUP.md](./docs/SETUP.md)** - Guía completa de configuración
-- **[API_GUIDE.md](./docs/API_GUIDE.md)** - Documentación de la API
-- **[FRONT_GUIDE.md](./docs/FRONT_GUIDE.md)** - Guía del frontend
+- **[SETUP.md](./SETUP.md)** - Guía completa de configuración y troubleshooting
+- **[API_GUIDE.md](./API_GUIDE.md)** - Documentación completa de la API
+- **[FRONT_GUIDE.md](./FRONT_GUIDE.md)** - Guía del frontend y componentes
 
 ## 🆘 Problemas Comunes
 
@@ -198,22 +200,15 @@ make up-build
 
 ## 🎨 Estructura del Proyecto
 
+> Para estructura detallada, consulta [SETUP.md](./SETUP.md)
+
 ```
 Aslin/
 ├── backend/          # API FastAPI
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── core/     # Configuración y seguridad
-│   │   ├── models/   # Modelos de BD
-│   │   ├── schemas/  # Validación Pydantic
-│   │   ├── api/      # Endpoints
-│   │   └── services/ # Lógica de negocio
-│   └── alembic/      # Migraciones
 ├── frontend/         # Next.js 15
-│   ├── app/          # Páginas (App Router)
-│   ├── components/   # Componentes reutilizables
-│   └── lib/          # Servicios y utilidades
-└── docs/             # Documentación
+├── docs/             # Documentación
+├── db/               # Scripts de base de datos
+└── docker-compose.yml
 ```
 
 ## 🚀 Desarrollo
@@ -225,15 +220,14 @@ Para desarrollo activo:
 3. Consulta `/docs` para probar endpoints
 4. Revisa la documentación para entender la arquitectura
 
-## 🔐 Credenciales por Defecto
+## 🔐 Usuarios Iniciales
 
-**Base de Datos:**
-- Usuario: `aslin_user`
-- Password: `aslin_password`
-- Base de datos: `aslin_db`
-- Puerto: `5432`
+El sistema viene con usuarios preconfigurados:
 
-**⚠️ IMPORTANTE**: Cambia estas credenciales en producción!
+- **SuperAdmin**: `desarrollo@asicomsystems.com.mx` / `123456789`
+- **Administrador**: `usuario@dxlegal.mx` / `123456789`
+
+> Para más detalles, consulta [SETUP.md](./SETUP.md)
 
 ---
 

@@ -119,11 +119,10 @@ Aslin/
 
 Para más información detallada, consulta la carpeta `docs/`:
 
-- [Setup Guide](./docs/SETUP.md) - Guía de instalación y configuración
-- [API Guide](./docs/API_GUIDE.md) - Documentación de la API
-- [Frontend Guide](./docs/FRONT_GUIDE.md) - Estructura del frontend
-- [Quick Start](./docs/QUICK_START.md) - Inicio rápido
-- [Instrucciones Iniciales](./docs/INSTRUCCIONES_INICIALES.md) - Guía completa
+- [Quick Start](./docs/QUICK_START.md) - Inicio rápido en 5 minutos
+- [Setup Guide](./docs/SETUP.md) - Guía completa de instalación y configuración
+- [API Guide](./docs/API_GUIDE.md) - Documentación completa de la API
+- [Frontend Guide](./docs/FRONT_GUIDE.md) - Guía del frontend y componentes
 
 ## 🔒 Seguridad
 

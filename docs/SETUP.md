@@ -277,7 +277,7 @@ npm start
 
 ## ❓ Problemas Comunes
 
-### "Port already in use"
+### Puerto Ocupado
 
 ```bash
 # Encontrar proceso usando el puerto
@@ -287,31 +287,75 @@ netstat -ano | findstr :8000
 # Linux/Mac
 lsof -i :8000
 
-# Matar proceso o cambiar puerto en docker-compose.yml
+# Soluciones:
+# 1. Matar el proceso
+# 2. Cambiar puerto en docker-compose.yml
+# 3. Usar make down para detener servicios
 ```
 
-### "Cannot connect to database"
+### No Conecta a la Base de Datos
 
 ```bash
-# Verificar que PostgreSQL esté corriendo
-docker-compose ps
+# Verificar estado de servicios
+make status
 
 # Ver logs de la base de datos
-docker-compose logs db
+make logs-db
 
 # Reiniciar servicios
-docker-compose restart
+make restart
+
+# Si persiste, reconstruir
+make down
+make up-build
 ```
 
-### Cambios no se reflejan
+### Cambios No Se Reflejan
 
 ```bash
 # Reconstruir contenedores
-docker-compose up --build
+make down
+make up-build
 
-# Limpiar y reconstruir
+# O usando Docker Compose directamente
 docker-compose down
 docker-compose up --build
+```
+
+### Error en Migraciones
+
+```bash
+# Ver estado actual
+docker-compose exec backend alembic current
+
+# Aplicar migraciones pendientes
+make migrate
+
+# Si hay conflictos, resetear (¡CUIDADO: borra datos!)
+make down-v
+make up-build
+```
+
+### Problemas de Permisos (Linux/Mac)
+
+```bash
+# Cambiar permisos de archivos
+sudo chown -R $USER:$USER .
+
+# Dar permisos de ejecución al Makefile
+chmod +x Makefile
+```
+
+### Memoria Insuficiente
+
+```bash
+# Verificar uso de memoria
+docker stats
+
+# Limpiar contenedores e imágenes no utilizadas
+make clean
+
+# Aumentar memoria de Docker Desktop si es necesario
 ```
 
 ## 📞 Soporte
