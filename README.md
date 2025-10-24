@@ -139,12 +139,35 @@ Para más información detallada, consulta la carpeta `docs/`:
 
 - **Arquitectura modular** con separación clara de responsabilidades
 - **API REST** documentada con Swagger/OpenAPI
-- **Autenticación robusta** con JWT y 2FA
+- **Autenticación robusta** con JWT y 2FA (TOTP)
 - **Interfaz moderna** con Next.js 15 y Tailwind CSS
-- **Base de datos** PostgreSQL con migraciones automáticas
+- **Base de datos** PostgreSQL con estructura completamente en español
+- **Multiempresa** con control de acceso por empresa (RLS)
 - **Contenedorización** completa con Docker
 - **Hot reload** para desarrollo ágil
 - **Tests automatizados** con pytest
+
+## 🗄️ Estructura de Base de Datos
+
+El sistema utiliza una base de datos normalizada completamente en español:
+
+### Tablas Principales
+- **`usuarios`** - Cuentas de usuario con autenticación
+- **`empresas`** - Información de empresas y branding
+- **`roles`** - Roles y permisos del sistema
+- **`usuario_perfiles`** - Datos personales de usuarios
+- **`usuario_contactos`** - Información de contacto
+- **`usuario_direcciones`** - Direcciones de usuarios
+- **`usuario_2fa`** - Configuración de autenticación de doble factor
+- **`menus`** - Estructura de navegación del sistema
+- **`accesos`** - Log de accesos al sistema
+
+### Características
+- **UUIDs** como identificadores únicos
+- **Row Level Security (RLS)** para control de acceso por empresa
+- **Estructura multiempresa** con soporte para usuarios que trabajan en múltiples empresas
+- **Auditoría** con timestamps de creación y actualización
+- **Soft delete** para eliminación lógica de registros
 
 ## 🤝 Contribución
 

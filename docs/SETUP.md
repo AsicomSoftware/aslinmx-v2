@@ -104,18 +104,44 @@ docker-compose exec backend alembic downgrade -1
 docker-compose exec backend alembic upgrade <revision_id>
 ```
 
-## 👤 Crear Usuario Inicial
+## 👤 Usuarios Iniciales
 
-Puedes crear un usuario de prueba usando la API:
+El sistema viene con usuarios preconfigurados según el archivo `db/main_db.sql`:
+
+### Usuarios Disponibles
+
+1. **SuperAdmin**:
+   - **Email**: `desarrollo@asicomsystems.com.mx`
+   - **Contraseña**: `123456789`
+   - **Rol**: SuperAdmin (acceso completo)
+   - **Empresa**: DX Legal
+   - **Multiempresa**: Sí
+
+2. **Administrador**:
+   - **Email**: `usuario@dxlegal.mx`
+   - **Contraseña**: `123456789`
+   - **Rol**: Administrador
+   - **Empresa**: DX Legal
+   - **Multiempresa**: No
+
+### Empresa Inicial
+
+- **Nombre**: DX Legal
+- **Alias**: dxlegal
+- **Colores**: Principal #c43267, Secundario #2b4f83, Terciario #3098cb
+
+### Crear Usuario Adicional
+
+También puedes crear un usuario de prueba usando la API:
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/users/register" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@aslin.com",
-    "username": "admin",
-    "full_name": "Administrador",
-    "password": "admin123"
+    "email": "test@ejemplo.com",
+    "username": "testuser",
+    "full_name": "Usuario Test",
+    "password": "test123456"
   }'
 ```
 

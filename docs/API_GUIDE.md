@@ -10,6 +10,21 @@ Documentación completa de los endpoints disponibles en la API REST de Aslin 2.0
 - **Autenticación**: JWT (Bearer Token) + 2FA (TOTP)
 - **Versión**: 2.0.0
 
+### 📋 Nota sobre la Estructura de Datos
+
+El sistema utiliza una estructura de base de datos completamente en español:
+
+**Base de Datos (Español)**:
+- **Tablas**: `usuarios`, `empresas`, `roles`, `usuario_perfiles`, `usuario_contactos`, `usuario_direcciones`, `usuario_2fa`
+- **Campos**: `correo`, `password_hash`, `activo`, `creado_en`, `actualizado_en`, `nombre`, `apellido_paterno`, `apellido_materno`
+- **IDs**: UUIDs generados automáticamente
+- **Relaciones**: Usuario tiene perfil, contactos, dirección y configuración 2FA en tablas separadas
+
+**API (Inglés para compatibilidad)**:
+- La API mantiene nombres en inglés (`email`, `is_active`, `created_at`, etc.) para compatibilidad con estándares internacionales
+- Los sinónimos en el modelo permiten mapear entre ambos formatos
+- Esto facilita la integración con frontends y herramientas externas
+
 ## 🔐 Autenticación
 
 La API usa JWT (JSON Web Tokens) con soporte para autenticación de doble factor (2FA) usando TOTP. La mayoría de los endpoints requieren un token válido.
@@ -95,14 +110,20 @@ Content-Type: application/json
 **Respuesta Exitosa (201)**:
 ```json
 {
-  "id": 1,
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "email": "usuario@ejemplo.com",
   "username": "usuario123",
   "full_name": "Nombre Completo",
   "is_active": true,
-  "is_superuser": false,
-  "created_at": "2024-01-15T10:30:00",
-  "updated_at": null
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": null,
+  "empresa": null,
+  "rol": null,
+  "perfil": null,
+  "contactos": null,
+  "direccion": null,
+  "two_factor_enabled": false,
+  "two_factor_verified_at": null
 }
 ```
 
@@ -189,14 +210,20 @@ Authorization: Bearer {token}
 **Respuesta Exitosa (200)**:
 ```json
 {
-  "id": 1,
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "email": "usuario@ejemplo.com",
   "username": "usuario123",
   "full_name": "Nombre Completo",
   "is_active": true,
-  "is_superuser": false,
-  "created_at": "2024-01-15T10:30:00",
-  "updated_at": null
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": null,
+  "empresa": null,
+  "rol": null,
+  "perfil": null,
+  "contactos": null,
+  "direccion": null,
+  "two_factor_enabled": false,
+  "two_factor_verified_at": null
 }
 ```
 
@@ -219,24 +246,36 @@ Authorization: Bearer {token}
 ```json
 [
   {
-    "id": 1,
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "email": "usuario1@ejemplo.com",
     "username": "usuario1",
     "full_name": "Usuario Uno",
     "is_active": true,
-    "is_superuser": false,
-    "created_at": "2024-01-15T10:30:00",
-    "updated_at": null
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": null,
+    "empresa": null,
+    "rol": null,
+    "perfil": null,
+    "contactos": null,
+    "direccion": null,
+    "two_factor_enabled": false,
+    "two_factor_verified_at": null
   },
   {
-    "id": 2,
+    "id": "550e8400-e29b-41d4-a716-446655440001",
     "email": "usuario2@ejemplo.com",
     "username": "usuario2",
     "full_name": "Usuario Dos",
     "is_active": true,
-    "is_superuser": false,
-    "created_at": "2024-01-15T11:00:00",
-    "updated_at": null
+    "created_at": "2024-01-15T11:00:00Z",
+    "updated_at": null,
+    "empresa": null,
+    "rol": null,
+    "perfil": null,
+    "contactos": null,
+    "direccion": null,
+    "two_factor_enabled": false,
+    "two_factor_verified_at": null
   }
 ]
 ```
@@ -255,14 +294,20 @@ Authorization: Bearer {token}
 **Respuesta Exitosa (200)**:
 ```json
 {
-  "id": 1,
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "email": "usuario@ejemplo.com",
   "username": "usuario123",
   "full_name": "Nombre Completo",
   "is_active": true,
-  "is_superuser": false,
-  "created_at": "2024-01-15T10:30:00",
-  "updated_at": null
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": null,
+  "empresa": null,
+  "rol": null,
+  "perfil": null,
+  "contactos": null,
+  "direccion": null,
+  "two_factor_enabled": false,
+  "two_factor_verified_at": null
 }
 ```
 
@@ -292,14 +337,20 @@ Content-Type: application/json
 **Respuesta Exitosa (200)**:
 ```json
 {
-  "id": 1,
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "email": "nuevo@ejemplo.com",
   "username": "usuario123",
   "full_name": "Nuevo Nombre",
   "is_active": true,
-  "is_superuser": false,
-  "created_at": "2024-01-15T10:30:00",
-  "updated_at": "2024-01-15T14:20:00"
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T14:20:00Z",
+  "empresa": null,
+  "rol": null,
+  "perfil": null,
+  "contactos": null,
+  "direccion": null,
+  "two_factor_enabled": false,
+  "two_factor_verified_at": null
 }
 ```
 
@@ -318,6 +369,142 @@ Authorization: Bearer {token}
 
 **Errores**:
 - `404`: Usuario no encontrado
+
+---
+
+### 9. Actualizar Perfil de Usuario Actual
+
+Actualiza información del perfil, contactos y dirección del usuario autenticado.
+
+```http
+PUT /api/v1/users/me
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "perfil": {
+    "nombre": "Juan",
+    "apellido_paterno": "Pérez",
+    "apellido_materno": "García",
+    "titulo": "Ing.",
+    "cedula_profesional": "12345678"
+  },
+  "contactos": {
+    "telefono": "555-1234",
+    "celular": "555-5678"
+  },
+  "direccion": {
+    "direccion": "Calle Principal 123",
+    "ciudad": "Ciudad de México",
+    "estado": "CDMX",
+    "codigo_postal": "01000",
+    "pais": "México"
+  }
+}
+```
+
+**Respuesta Exitosa (200)**:
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "usuario@ejemplo.com",
+  "username": "usuario123",
+  "full_name": "Juan Pérez García",
+  "is_active": true,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T14:20:00Z",
+  "empresa": null,
+  "rol": null,
+  "perfil": {
+    "nombre": "Juan",
+    "apellido_paterno": "Pérez",
+    "apellido_materno": "García",
+    "titulo": "Ing.",
+    "cedula_profesional": "12345678"
+  },
+  "contactos": {
+    "telefono": "555-1234",
+    "celular": "555-5678"
+  },
+  "direccion": {
+    "direccion": "Calle Principal 123",
+    "ciudad": "Ciudad de México",
+    "estado": "CDMX",
+    "codigo_postal": "01000",
+    "pais": "México"
+  },
+  "two_factor_enabled": false,
+  "two_factor_verified_at": null
+}
+```
+
+---
+
+### 10. Cambiar Contraseña
+
+Cambia la contraseña del usuario autenticado.
+
+```http
+PUT /api/v1/users/me/password
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "current_password": "contraseña_actual",
+  "new_password": "nueva_contraseña123"
+}
+```
+
+**Respuesta Exitosa (200)**:
+```json
+{
+  "success": true,
+  "detail": "Contraseña actualizada"
+}
+```
+
+---
+
+### 11. Habilitar/Deshabilitar 2FA
+
+Habilita o deshabilita la autenticación de doble factor.
+
+```http
+POST /api/v1/users/me/2fa/toggle
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "enable": true,
+  "code": "123456"
+}
+```
+
+**Respuesta Exitosa (200)**:
+```json
+{
+  "success": true,
+  "detail": "Estado de 2FA actualizado"
+}
+```
+
+---
+
+### 12. Obtener URI para Configurar 2FA
+
+Obtiene la URI para configurar la aplicación de autenticación 2FA.
+
+```http
+GET /api/v1/users/me/2fa/otpauth
+Authorization: Bearer {token}
+```
+
+**Respuesta Exitosa (200)**:
+```json
+{
+  "otpauth_url": "otpauth://totp/Aslin%202.0:usuario@ejemplo.com?secret=JBSWY3DPEHPK3PXP&issuer=Aslin%202.0"
+}
+```
 
 ---
 
@@ -389,12 +576,28 @@ curl -X POST "http://localhost:8000/api/v1/users/register" \
     "password": "test123456"
   }'
 
-# Login
+# Login (sin 2FA)
 curl -X POST "http://localhost:8000/api/v1/users/login" \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "testuser",
+    "username": "test@ejemplo.com",
     "password": "test123456"
+  }'
+
+# Login con 2FA (paso 1)
+curl -X POST "http://localhost:8000/api/v1/users/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "test@ejemplo.com",
+    "password": "test123456"
+  }'
+
+# Verificar 2FA (paso 2)
+curl -X POST "http://localhost:8000/api/v1/users/2fa/verify" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "temp_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "code": "123456"
   }'
 ```
 
@@ -411,6 +614,44 @@ curl -X GET "http://localhost:8000/api/v1/users/me" \
 # Listar usuarios
 curl -X GET "http://localhost:8000/api/v1/users/?skip=0&limit=10" \
   -H "Authorization: Bearer $TOKEN"
+
+# Actualizar perfil de usuario
+curl -X PUT "http://localhost:8000/api/v1/users/me" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "perfil": {
+      "nombre": "Juan",
+      "apellido_paterno": "Pérez",
+      "apellido_materno": "García"
+    },
+    "contactos": {
+      "telefono": "555-1234",
+      "celular": "555-5678"
+    }
+  }'
+
+# Cambiar contraseña
+curl -X PUT "http://localhost:8000/api/v1/users/me/password" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "current_password": "contraseña_actual",
+    "new_password": "nueva_contraseña123"
+  }'
+
+# Obtener URI para configurar 2FA
+curl -X GET "http://localhost:8000/api/v1/users/me/2fa/otpauth" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Habilitar 2FA
+curl -X POST "http://localhost:8000/api/v1/users/me/2fa/toggle" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enable": true,
+    "code": "123456"
+  }'
 ```
 
 ---
@@ -424,11 +665,32 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/v1';
 
-// Login
+// Login con soporte para 2FA
 const login = async (username: string, password: string) => {
   const response = await axios.post(`${API_URL}/users/login`, {
     username,
     password
+  });
+  
+  if (response.data.requires_2fa) {
+    // Retorna temp_token para verificar 2FA
+    return {
+      requires_2fa: true,
+      temp_token: response.data.temp_token
+    };
+  } else {
+    // Login directo sin 2FA
+    const token = response.data.access_token;
+    localStorage.setItem('token', token);
+    return { access_token: token };
+  }
+};
+
+// Verificar 2FA
+const verify2FA = async (tempToken: string, code: string) => {
+  const response = await axios.post(`${API_URL}/users/2fa/verify`, {
+    temp_token: tempToken,
+    code
   });
   
   const token = response.data.access_token;
@@ -436,13 +698,27 @@ const login = async (username: string, password: string) => {
   return token;
 };
 
-// Petición autenticada
-const getUsers = async () => {
+// Obtener usuario actual
+const getCurrentUser = async () => {
   const token = localStorage.getItem('token');
   
-  const response = await axios.get(`${API_URL}/users/`, {
+  const response = await axios.get(`${API_URL}/users/me`, {
     headers: {
       'Authorization': `Bearer ${token}`
+    }
+  });
+  
+  return response.data;
+};
+
+// Actualizar perfil de usuario
+const updateProfile = async (profileData: any) => {
+  const token = localStorage.getItem('token');
+  
+  const response = await axios.put(`${API_URL}/users/me`, profileData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     }
   });
   
@@ -488,11 +764,31 @@ Para endpoints protegidos:
 Los siguientes módulos serán agregados próximamente:
 
 - `/api/v1/siniestros` - Gestión de siniestros
-- `/api/v1/bitacora` - Registro de actividades
-- `/api/v1/reportes` - Generación de reportes
-- `/api/v1/analytics` - Analíticas y estadísticas
+- `/api/v1/agenda` - Gestión de agenda
 - `/api/v1/empresas` - Gestión de empresas
 - `/api/v1/roles` - Gestión de roles y permisos
+- `/api/v1/parametros` - Configuración de parámetros
+- `/api/v1/reportes` - Generación de reportes
+- `/api/v1/configuracion` - Configuración del sistema
+- `/api/v1/historico` - Histórico de actividades
+- `/api/v1/soporte` - Ayuda y soporte
+- `/api/v1/menus` - Gestión de menús y navegación
+- `/api/v1/accesos` - Log de accesos al sistema
+
+### Estructura de Menús Predefinida
+
+El sistema incluye una estructura de menús en español:
+
+1. **Dashboard** (`/dashboard`) - Panel principal
+2. **Siniestros** (`/siniestros`) - Gestión de siniestros
+3. **Agenda** (`/agenda`) - Calendario y citas
+4. **Empresas** (`/empresas`) - Gestión de empresas
+5. **Usuarios y Roles** (`/usuarios`) - Administración de usuarios
+6. **Parámetros** (`/parametros`) - Configuración de parámetros
+7. **Reportes** (`/reportes`) - Generación de reportes
+8. **Configuración** (`/configuracion`) - Configuración del sistema
+9. **Histórico** (`/historico`) - Histórico de actividades
+10. **Ayuda y Soporte** (`/soporte`) - Ayuda y soporte
 
 ---
 
