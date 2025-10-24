@@ -7,13 +7,16 @@ Documentación completa de los endpoints disponibles en la API REST de Aslin 2.0
 - **Base URL**: `http://localhost:8000/api/v1`
 - **Documentación Interactiva**: http://localhost:8000/docs
 - **Formato**: JSON
-- **Autenticación**: JWT (Bearer Token)
+- **Autenticación**: JWT (Bearer Token) + 2FA (TOTP)
+- **Versión**: 2.0.0
 
 ## 🔐 Autenticación
 
-La API usa JWT (JSON Web Tokens) para autenticación. La mayoría de los endpoints requieren un token válido.
+La API usa JWT (JSON Web Tokens) con soporte para autenticación de doble factor (2FA) usando TOTP. La mayoría de los endpoints requieren un token válido.
 
-### Obtener Token
+### Flujo de Autenticación
+
+#### 1. Login Inicial
 
 ```http
 POST /api/v1/users/login
@@ -22,6 +25,36 @@ Content-Type: application/json
 {
   "username": "usuario",
   "password": "contraseña"
+}
+```
+
+**Respuesta con 2FA habilitado (200)**:
+```json
+{
+  "temp_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "requires_2fa": true,
+  "message": "Ingresa el código 2FA"
+}
+```
+
+**Respuesta sin 2FA (200)**:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "requires_2fa": false
+}
+```
+
+#### 2. Verificar 2FA (si está habilitado)
+
+```http
+POST /api/v1/users/2fa/verify
+Content-Type: application/json
+
+{
+  "temp_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "code": "123456"
 }
 ```
 
@@ -81,7 +114,7 @@ Content-Type: application/json
 
 ### 2. Login
 
-Autentica un usuario y retorna un token JWT.
+Autentica un usuario y retorna un token JWT. Si el usuario tiene 2FA habilitado, retorna un token temporal que debe ser verificado.
 
 ```http
 POST /api/v1/users/login
@@ -90,6 +123,44 @@ Content-Type: application/json
 {
   "username": "usuario123",
   "password": "contraseña123"
+}
+```
+
+**Respuesta con 2FA habilitado (200)**:
+```json
+{
+  "temp_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "requires_2fa": true,
+  "message": "Ingresa el código 2FA"
+}
+```
+
+**Respuesta sin 2FA (200)**:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "requires_2fa": false
+}
+```
+
+**Errores**:
+- `401`: Credenciales incorrectas
+- `400`: Usuario inactivo
+
+---
+
+### 3. Verificar 2FA
+
+Verifica el código TOTP y retorna el token de acceso final.
+
+```http
+POST /api/v1/users/2fa/verify
+Content-Type: application/json
+
+{
+  "temp_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "code": "123456"
 }
 ```
 
@@ -102,12 +173,11 @@ Content-Type: application/json
 ```
 
 **Errores**:
-- `401`: Credenciales incorrectas
-- `400`: Usuario inactivo
+- `401`: Código 2FA inválido o token expirado
 
 ---
 
-### 3. Obtener Usuario Actual
+### 4. Obtener Usuario Actual
 
 Obtiene información del usuario autenticado.
 
@@ -132,7 +202,7 @@ Authorization: Bearer {token}
 
 ---
 
-### 4. Listar Usuarios
+### 5. Listar Usuarios
 
 Obtiene lista de usuarios con paginación.
 
@@ -173,7 +243,7 @@ Authorization: Bearer {token}
 
 ---
 
-### 5. Obtener Usuario por ID
+### 6. Obtener Usuario por ID
 
 Obtiene información de un usuario específico.
 
@@ -201,7 +271,7 @@ Authorization: Bearer {token}
 
 ---
 
-### 6. Actualizar Usuario
+### 7. Actualizar Usuario
 
 Actualiza información de un usuario.
 
@@ -235,7 +305,7 @@ Content-Type: application/json
 
 ---
 
-### 7. Eliminar Usuario
+### 8. Eliminar Usuario
 
 Elimina un usuario del sistema.
 
@@ -421,6 +491,8 @@ Los siguientes módulos serán agregados próximamente:
 - `/api/v1/bitacora` - Registro de actividades
 - `/api/v1/reportes` - Generación de reportes
 - `/api/v1/analytics` - Analíticas y estadísticas
+- `/api/v1/empresas` - Gestión de empresas
+- `/api/v1/roles` - Gestión de roles y permisos
 
 ---
 

@@ -22,8 +22,11 @@ docker-compose --version
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AsicomSoftware/aslinmx-v2.git
 cd Aslin
+
+# Agregar upstream para sincronizar cambios (opcional)
+git remote add upstream https://github.com/AsicomSoftware/aslinmx-v2.git
 ```
 
 ### 2. Configurar Variables de Entorno
@@ -44,17 +47,23 @@ El archivo `.env` ya viene configurado con valores por defecto. Si necesitas mod
 ### 3. Levantar el Proyecto
 
 ```bash
-# Construir y levantar todos los servicios
-docker-compose up --build
+# Opción 1: Usar Makefile (recomendado)
+make install
 
-# O en modo detached (segundo plano)
+# Opción 2: Docker Compose directo
 docker-compose up --build -d
 ```
 
 Este comando levantará:
-- **PostgreSQL** en puerto `5432`
+- **PostgreSQL 15** en puerto `5432`
 - **Backend (FastAPI)** en puerto `8000`
-- **Frontend (Next.js)** en puerto `3000`
+- **Frontend (Next.js 15)** en puerto `3000`
+
+**Nota**: El comando `make install` incluye:
+- Construcción de imágenes
+- Levantamiento de servicios
+- Espera automática para que los servicios estén listos
+- Información de URLs disponibles
 
 ### 4. Verificar que Todo Funciona
 
@@ -70,23 +79,28 @@ Una vez que los servicios estén corriendo:
 ### Crear Migración Inicial
 
 ```bash
-# Crear primera migración
-docker-compose exec backend alembic revision --autogenerate -m "Initial migration"
+# Crear primera migración usando Makefile
+make migrate-create MSG="Initial migration"
 
 # Aplicar migraciones
+make migrate
+
+# O usando Docker Compose directamente
+docker-compose exec backend alembic revision --autogenerate -m "Initial migration"
 docker-compose exec backend alembic upgrade head
 ```
 
 ### Comandos Útiles de Alembic
 
 ```bash
-# Ver historial de migraciones
+# Usando Makefile (recomendado)
+make migrate                    # Aplicar migraciones
+make migrate-create MSG="mensaje"  # Crear migración
+make migrate-down               # Revertir última migración
+
+# Usando Docker Compose directamente
 docker-compose exec backend alembic history
-
-# Revertir última migración
 docker-compose exec backend alembic downgrade -1
-
-# Ir a una versión específica
 docker-compose exec backend alembic upgrade <revision_id>
 ```
 
@@ -107,60 +121,73 @@ curl -X POST "http://localhost:8000/api/v1/users/register" \
 
 O desde la interfaz web en: http://localhost:3000/login
 
-## 🛠️ Comandos Docker Útiles
+## 🛠️ Comandos Útiles
 
-### Ver Logs
+### Usando Makefile (Recomendado)
 
 ```bash
-# Ver logs de todos los servicios
-docker-compose logs -f
+# Ver todos los comandos disponibles
+make help
 
-# Ver logs de un servicio específico
+# Gestión de servicios
+make up                      # Levantar servicios
+make down                    # Detener servicios
+make restart                 # Reiniciar servicios
+make status                  # Ver estado de servicios
+
+# Logs
+make logs                    # Ver logs de todos los servicios
+make logs-backend            # Ver logs del backend
+make logs-frontend           # Ver logs del frontend
+make logs-db                 # Ver logs de la base de datos
+
+# Base de datos
+make migrate                 # Aplicar migraciones
+make migrate-create MSG="mensaje"  # Crear migración
+make migrate-down            # Revertir última migración
+make shell-db                # Acceder a PostgreSQL
+
+# Desarrollo
+make shell-backend           # Acceder al shell del backend
+make shell-frontend          # Acceder al shell del frontend
+make test                    # Ejecutar tests
+make test-cov                # Tests con cobertura
+make clean                   # Limpiar contenedores e imágenes
+```
+
+### Comandos Docker Directos
+
+```bash
+# Ver logs
 docker-compose logs -f backend
 docker-compose logs -f frontend
 docker-compose logs -f db
-```
 
-### Reiniciar Servicios
-
-```bash
-# Reiniciar todos los servicios
+# Reiniciar servicios
 docker-compose restart
-
-# Reiniciar un servicio específico
 docker-compose restart backend
-```
 
-### Detener Servicios
+# Detener servicios
+docker-compose down          # Mantiene volúmenes
+docker-compose down -v       # Elimina volúmenes (¡CUIDADO!)
 
-```bash
-# Detener servicios (mantiene volúmenes)
-docker-compose down
-
-# Detener y eliminar volúmenes (CUIDADO: borra la BD)
-docker-compose down -v
-```
-
-### Acceder a Contenedores
-
-```bash
-# Shell en el backend
+# Acceder a contenedores
 docker-compose exec backend bash
-
-# Shell en el frontend
 docker-compose exec frontend sh
-
-# Shell en PostgreSQL
-docker-compose exec db psql -U aslin_user -d aslin_db
+docker-compose exec db psql -U root -d aslin_mx_v2
 ```
 
 ## 🧪 Ejecutar Tests
 
 ```bash
-# Tests del backend
-docker-compose exec backend pytest
+# Tests del backend usando Makefile
+make test
 
 # Tests con coverage
+make test-cov
+
+# O usando Docker Compose directamente
+docker-compose exec backend pytest
 docker-compose exec backend pytest --cov=app --cov-report=html
 ```
 

@@ -6,38 +6,47 @@ Documentación de la estructura y funcionamiento del frontend construido con Nex
 
 El frontend está construido con:
 
-- **Next.js 15** con App Router
-- **TypeScript** para tipado estático
-- **Tailwind CSS** para estilos
-- **Axios** para peticiones HTTP
-- **React Toastify** para notificaciones
+- **Next.js 15.0.0** con App Router
+- **TypeScript 5** para tipado estático
+- **Tailwind CSS 3.4.1** para estilos
+- **Axios 1.6.5** para peticiones HTTP
+- **React Toastify 10.0.4** para notificaciones
+- **React Icons 4.12.0** para iconografía
 
 ## 📁 Estructura de Carpetas
 
 ```
 frontend/
 ├── app/                          # App Router de Next.js 15
-│   ├── layout.tsx               # Layout raíz
+│   ├── layout.tsx               # Layout raíz con providers
 │   ├── page.tsx                 # Página principal
 │   ├── login/                   # Módulo de login
 │   │   └── page.tsx
-│   └── dashboard/               # Módulo de dashboard
-│       ├── page.tsx
-│       └── components/          # Componentes del dashboard
-│           ├── CardInfo.tsx
-│           └── DataTable.tsx
+│   ├── dashboard/               # Módulo de dashboard
+│   │   ├── page.tsx
+│   │   └── components/          # Componentes del dashboard
+│   └── perfil/                  # Módulo de perfil
+│       └── page.tsx
 ├── components/                   # Componentes reutilizables
+│   ├── AppShell.tsx             # Shell principal de la app
+│   ├── ClientLayout.tsx         # Layout del cliente
+│   ├── Navbar.tsx               # Barra de navegación
+│   ├── Sidebar.tsx              # Barra lateral
 │   └── ui/                      # Componentes de UI
 │       ├── Button.tsx
-│       ├── Input.tsx
-│       └── Modal.tsx
+│       └── Input.tsx
+├── context/                     # Contextos de React
+│   └── UserContext.tsx          # Contexto de usuario
 ├── lib/                         # Utilidades y servicios
 │   └── apiService.ts           # Cliente de API
 ├── styles/                      # Estilos globales
 │   └── globals.css
-├── public/                      # Archivos estáticos
+├── assets/                      # Recursos estáticos
+│   ├── icons/                   # Iconos del sistema
+│   └── logos/                   # Logotipos
 ├── next.config.ts              # Configuración de Next.js
 ├── tailwind.config.ts          # Configuración de Tailwind
+├── tsconfig.json               # Configuración de TypeScript
 └── package.json                # Dependencias
 ```
 
@@ -292,10 +301,15 @@ Tabla para mostrar lista de usuarios.
 
 1. Usuario ingresa credenciales en `/login`
 2. Se envía petición a `/api/v1/users/login`
-3. Backend retorna JWT token
-4. Token se guarda en `localStorage`
-5. Token se incluye automáticamente en peticiones futuras
-6. Si token expira, se redirige a login
+3. Backend retorna:
+   - Si 2FA está habilitado: `temp_token` y `requires_2fa: true`
+   - Si no: `access_token` directamente
+4. Si requiere 2FA, usuario ingresa código TOTP
+5. Se envía petición a `/api/v1/users/2fa/verify`
+6. Backend retorna `access_token` final
+7. Token se guarda en `localStorage`
+8. Token se incluye automáticamente en peticiones futuras
+9. Si token expira, se redirige a login
 
 ### Proteger Rutas
 
@@ -599,7 +613,7 @@ test('renders button with text', () => {
 
 ## 🔮 Próximas Mejoras
 
-- [ ] Context API para estado global
+- [x] Context API para estado global (UserContext implementado)
 - [ ] Middleware de autenticación
 - [ ] Tests unitarios e integración
 - [ ] Modo oscuro
@@ -607,6 +621,10 @@ test('renders button with text', () => {
 - [ ] PWA capabilities
 - [ ] Optimización de imágenes
 - [ ] SEO mejorado
+- [ ] Componentes adicionales de UI (Modal, Select, etc.)
+- [ ] Dashboard con más funcionalidades
+- [ ] Gestión de perfil de usuario
+- [ ] Notificaciones en tiempo real
 
 ---
 

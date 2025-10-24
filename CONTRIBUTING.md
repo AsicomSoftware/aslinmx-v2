@@ -17,6 +17,9 @@
 # Luego clona tu fork
 git clone https://github.com/AsicomSoftware/aslinmx-v2.git
 cd Aslin
+
+# Agregar upstream para sincronizar cambios
+git remote add upstream https://github.com/AsicomSoftware/aslinmx-v2.git
 ```
 
 ### 2. Crear Rama
@@ -38,14 +41,21 @@ git checkout -b fix/correccion-bug
 ### 3. Desarrollo
 
 ```bash
-# Levantar entorno
-docker-compose up -d
+# Levantar entorno usando Makefile (recomendado)
+make install
 
-# Hacer cambios
+# O usando Docker Compose directamente
+docker-compose up --build -d
+
+# Hacer cambios en el código
 # ...
 
 # Probar cambios
 make test
+
+# Ver logs si hay problemas
+make logs-backend
+make logs-frontend
 ```
 
 ### 4. Commit
@@ -67,7 +77,17 @@ git commit -m "docs: actualizar guía de API"
 - `test`: Agregar tests
 - `chore`: Tareas de mantenimiento
 
-### 5. Push y Pull Request
+### 5. Sincronizar con Upstream
+
+```bash
+# Antes de crear tu PR, sincroniza con los cambios más recientes
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+```
+
+### 6. Push y Pull Request
 
 ```bash
 # Push a tu fork
@@ -86,8 +106,10 @@ Antes de crear un PR, verifica:
 - [ ] Se actualizó la documentación si es necesario
 - [ ] El código está formateado correctamente
 - [ ] No hay errores de linting
-- [ ] Se probó en ambiente local
-- [ ] El commit message es descriptivo
+- [ ] Se probó en ambiente local con Docker
+- [ ] El commit message sigue el formato semántico
+- [ ] Se sincronizó con la rama main más reciente
+- [ ] Se probó la funcionalidad en el frontend y backend
 
 ## 📝 Estándares de Código
 
@@ -146,14 +168,18 @@ export default function Button({
 ### Backend
 
 ```bash
-# Ejecutar tests
-docker-compose exec backend pytest
+# Ejecutar tests usando Makefile
+make test
 
 # Con cobertura
-docker-compose exec backend pytest --cov=app
+make test-cov
 
 # Test específico
 docker-compose exec backend pytest app/tests/test_user.py
+
+# Ver reporte de cobertura
+open htmlcov/index.html  # En macOS
+start htmlcov/index.html  # En Windows
 ```
 
 ### Escribir Tests
@@ -183,6 +209,8 @@ Si agregas nuevas funcionalidades:
 2. Actualiza `docs/FRONT_GUIDE.md` para nuevos componentes
 3. Agrega comentarios en el código
 4. Actualiza el README si es necesario
+5. Actualiza `docs/SETUP.md` si cambias la configuración
+6. Crea migraciones de base de datos si es necesario
 
 ## 🐛 Reportar Bugs
 
@@ -213,6 +241,31 @@ Cuando revises PRs de otros:
 - Explica el "por qué" de tus sugerencias
 - Aprueba cuando todo esté correcto
 - Usa GitHub suggestions para cambios menores
+
+## 🔧 Comandos Útiles para Desarrollo
+
+```bash
+# Ver todos los comandos disponibles
+make help
+
+# Desarrollo
+make up                    # Levantar servicios
+make down                  # Detener servicios
+make logs                  # Ver logs
+make restart               # Reiniciar servicios
+
+# Base de datos
+make migrate               # Aplicar migraciones
+make migrate-create MSG="mensaje"  # Crear migración
+make shell-db              # Acceder a PostgreSQL
+
+# Testing
+make test                  # Ejecutar tests
+make test-cov              # Tests con cobertura
+
+# Limpieza
+make clean                 # Limpiar contenedores e imágenes
+```
 
 ## 📞 Comunicación
 
