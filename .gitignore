@@ -63,10 +63,10 @@ docker-compose.override.yml
 
 # Logs
 logs/
-docs/
+reports/
 db/
 *.log
 
 # Alembic
-alembic/versions/__pycache__/
+backend/alembic/versions/__pycache__/
 

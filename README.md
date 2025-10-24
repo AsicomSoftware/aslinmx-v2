@@ -37,7 +37,7 @@ Sistema modular de gestión administrativa construido con arquitectura moderna y
 
 ```bash
 # Clonar el repositorio
-git clone <repository-url>
+git clone https://github.com/AsicomSoftware/aslinmx-v2.git
 cd Aslin
 
 # Copiar variables de entorno (si es necesario modificar)
@@ -71,7 +71,7 @@ docker-compose restart backend
 docker-compose exec backend alembic upgrade head
 ```
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura Inicial del Proyecto
 
 ```
 Aslin/

@@ -15,7 +15,7 @@
 ```bash
 # Fork el repositorio en GitHub
 # Luego clona tu fork
-git clone https://github.com/tu-usuario/Aslin.git
+git clone https://github.com/AsicomSoftware/aslinmx-v2.git
 cd Aslin
 ```
 
