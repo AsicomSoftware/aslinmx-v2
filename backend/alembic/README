@@ -1,0 +1,11 @@
+Generic single-database configuration for Alembic.
+
+Para crear una nueva migración:
+alembic revision --autogenerate -m "descripción de la migración"
+
+Para aplicar migraciones:
+alembic upgrade head
+
+Para revertir última migración:
+alembic downgrade -1
+
