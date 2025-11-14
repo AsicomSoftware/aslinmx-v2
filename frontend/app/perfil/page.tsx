@@ -5,7 +5,7 @@ import { useUser } from "@/context/UserContext";
 import apiService from "@/lib/apiService";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-import { toast } from "react-toastify";
+import { swalSuccess, swalError, swalInfo } from "@/lib/swal";
 
 export default function PerfilPage() {
   const { user, refresh, loading } = useUser();
@@ -78,7 +78,7 @@ export default function PerfilPage() {
       } catch (err: any) {
         if (!cancelled) {
           setQrDataUrl("");
-          toast.error("No se pudo generar el QR localmente");
+          swalError("No se pudo generar el QR localmente");
         }
       }
     }
@@ -108,9 +108,9 @@ export default function PerfilPage() {
     try {
       await apiService.updateMe(form);
       await refresh();
-      toast.success("Perfil actualizado");
+      await swalSuccess("Perfil actualizado");
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Error al actualizar");
+      swalError(err.response?.data?.detail || "Error al actualizar");
     } finally {
       setSaving(false);
     }
@@ -123,7 +123,7 @@ export default function PerfilPage() {
       // Cambiar contraseña si viene
       if (passwordForm.current_password && passwordForm.new_password) {
         if (passwordForm.new_password !== passwordForm.confirm_new_password) {
-          toast.error("Las contraseñas no coinciden");
+          swalError("Las contraseñas no coinciden");
           setSavingSecurity(false);
           return;
         }
@@ -136,7 +136,7 @@ export default function PerfilPage() {
           new_password: "",
           confirm_new_password: "",
         });
-        toast.success("Contraseña actualizada");
+        await swalSuccess("Contraseña actualizada");
       }
 
       // Toggle 2FA si cambió el switch (sin requerir código)
@@ -144,10 +144,10 @@ export default function PerfilPage() {
         await apiService.toggle2FA(twoFA.enable);
         setTwoFA({ enable: twoFA.enable, code: "" });
         await refresh();
-        toast.success("Estado de 2FA actualizado");
+        await swalSuccess("Estado de 2FA actualizado");
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Error en seguridad");
+      swalError(err.response?.data?.detail || "Error en seguridad");
     } finally {
       setSavingSecurity(false);
     }
@@ -475,14 +475,9 @@ export default function PerfilPage() {
                               ...s,
                               otpauth: data.otpauth_url,
                             }));
-                            toast.info(
-                              "Escanea el QR con tu app de autenticación"
-                            );
+                            await swalInfo("Escanea el QR con tu app de autenticación");
                           } catch (err: any) {
-                            toast.error(
-                              err.response?.data?.detail ||
-                                "No se pudo generar el QR"
-                            );
+                            swalError(err.response?.data?.detail || "No se pudo generar el QR");
                           }
                         }}
                         className="text-azul underline"
@@ -498,12 +493,9 @@ export default function PerfilPage() {
                               ...s,
                               otpauth: data.otpauth_url,
                             }));
-                            toast.success("QR refrescado");
+                            await swalSuccess("QR refrescado");
                           } catch (err: any) {
-                            toast.error(
-                              err.response?.data?.detail ||
-                                "No se pudo refrescar el QR"
-                            );
+                            swalError(err.response?.data?.detail || "No se pudo refrescar el QR");
                           }
                         }}
                         className="text-azul underline"
@@ -522,8 +514,8 @@ export default function PerfilPage() {
                             document.body.appendChild(link);
                             link.click();
                             document.body.removeChild(link);
-                          } catch (_) {
-                            toast.error("No se pudo descargar el QR");
+                            } catch (_) {
+                            swalError("No se pudo descargar el QR");
                           }
                         }}
                         className="text-azul underline disabled:opacity-50"
@@ -555,11 +547,9 @@ export default function PerfilPage() {
                                   await navigator.clipboard.writeText(
                                     twoFA.otpauth
                                   );
-                                  toast.success(
-                                    "Clave copiada al portapapeles"
-                                  );
+                                  await swalSuccess("Clave copiada al portapapeles");
                                 } catch (_) {
-                                  toast.error("No se pudo copiar");
+                                  swalError("No se pudo copiar");
                                 }
                               }}
                             >

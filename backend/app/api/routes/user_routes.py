@@ -20,6 +20,7 @@ from app.schemas.user_schema import (
     ChangePasswordRequest,
     TwoFAToggleRequest,
     OperationResult,
+    UserEmpresaSwitch,
 )
 from app.services.user_service import UserService
 from app.core.security import get_current_active_user
@@ -133,6 +134,19 @@ def toggle_two_factor(
     return {"success": True, "detail": "Estado de 2FA actualizado"}
 
 
+@router.post("/me/empresa", response_model=UserResponse)
+def set_active_empresa(
+    payload: UserEmpresaSwitch,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Actualiza la empresa activa del usuario autenticado.
+    """
+    updated = UserService.set_active_empresa(db, current_user, payload.empresa_id)
+    return updated
+
+
 @router.get("/me/2fa/otpauth")
 def get_otpauth_uri(
     db: Session = Depends(get_db),
@@ -187,6 +201,7 @@ def update_user(
 ):
     """
     Actualizar usuario (requiere autenticación)
+    Permite actualizar: email, username, full_name, password, is_active, empresa_id, rol_id, perfil, contactos, dirección
     """
     user = UserService.update_user(db, user_id, user_update)
     

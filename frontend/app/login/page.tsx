@@ -7,7 +7,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { swalSuccess, swalError, swalInfo } from "@/lib/swal";
 import apiService from "@/lib/apiService";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -42,7 +42,7 @@ export default function LoginPage() {
         const resp2 = await apiService.verify2FA(tempToken, code);
         localStorage.setItem("token", resp2.access_token);
         await refresh();
-        toast.success("¡Inicio de sesión exitoso!");
+        await swalSuccess("¡Inicio de sesión exitoso!");
         router.push("/dashboard");
         return;
       }
@@ -56,7 +56,7 @@ export default function LoginPage() {
       if (response.requires_2fa) {
         setRequires2FA(true);
         setTempToken(response.temp_token);
-        toast.info("Ingresa tu código 2FA");
+        await swalInfo("Ingresa tu código 2FA");
         return;
       }
 
@@ -65,13 +65,12 @@ export default function LoginPage() {
 
       // Hidratar datos del usuario inmediatamente
       await refresh();
-
-      toast.success("¡Inicio de sesión exitoso!");
+      await swalSuccess("¡Inicio de sesión exitoso!");
 
       // Redirigir al dashboard
       router.push("/dashboard");
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Error al iniciar sesión");
+      swalError(error.response?.data?.detail || "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }

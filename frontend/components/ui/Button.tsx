@@ -24,7 +24,7 @@ export default function Button({
   disabled = false,
   loading = false,
 }: ButtonProps) {
-  const baseClasses = "font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const baseClasses = "font-semibold rounded-lg flex flex-row items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
   
   const variantClasses = {
     primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500",

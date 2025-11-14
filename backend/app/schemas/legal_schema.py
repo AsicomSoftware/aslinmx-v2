@@ -1,0 +1,637 @@
+"""
+Schemas para catálogos legales
+Define los modelos Pydantic para validación y serialización
+"""
+
+from pydantic import BaseModel, Field
+from typing import Optional, Literal
+from datetime import datetime, date
+from uuid import UUID
+from decimal import Decimal
+
+
+# ===== ÁREAS =====
+class AreaBase(BaseModel):
+    """Schema base de área"""
+    nombre: str = Field(..., min_length=1, max_length=100)
+    descripcion: Optional[str] = None
+    codigo: Optional[str] = Field(None, max_length=20)
+    activo: bool = True
+
+
+class AreaCreate(AreaBase):
+    """Schema para crear área"""
+    pass
+
+
+class AreaUpdate(BaseModel):
+    """Schema para actualizar área"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=100)
+    descripcion: Optional[str] = None
+    codigo: Optional[str] = Field(None, max_length=20)
+    activo: Optional[bool] = None
+
+
+class AreaResponse(AreaBase):
+    """Schema de respuesta de área"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+
+# ===== ESTADOS DE SINIESTRO =====
+class EstadoSiniestroBase(BaseModel):
+    """Schema base de estado de siniestro"""
+    nombre: str = Field(..., min_length=1, max_length=50)
+    descripcion: Optional[str] = None
+    color: str = Field("#007bff", max_length=7)
+    orden: int = Field(0, ge=0)
+    activo: bool = True
+
+
+class EstadoSiniestroCreate(EstadoSiniestroBase):
+    """Schema para crear estado de siniestro"""
+    pass
+
+
+class EstadoSiniestroUpdate(BaseModel):
+    """Schema para actualizar estado de siniestro"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=50)
+    descripcion: Optional[str] = None
+    color: Optional[str] = Field(None, max_length=7)
+    orden: Optional[int] = Field(None, ge=0)
+    activo: Optional[bool] = None
+
+
+class EstadoSiniestroResponse(EstadoSiniestroBase):
+    """Schema de respuesta de estado de siniestro"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== CALIFICACIONES DE SINIESTRO =====
+class CalificacionSiniestroBase(BaseModel):
+    """Schema base de calificación de siniestro"""
+    nombre: str = Field(..., min_length=1, max_length=50)
+    descripcion: Optional[str] = None
+    color: str = Field("#475569", max_length=7)
+    orden: int = Field(0, ge=0)
+    activo: bool = True
+
+
+class CalificacionSiniestroCreate(CalificacionSiniestroBase):
+    """Schema para crear calificación de siniestro"""
+    pass
+
+
+class CalificacionSiniestroUpdate(BaseModel):
+    """Schema para actualizar calificación de siniestro"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=50)
+    descripcion: Optional[str] = None
+    color: Optional[str] = Field(None, max_length=7)
+    orden: Optional[int] = Field(None, ge=0)
+    activo: Optional[bool] = None
+
+
+class CalificacionSiniestroResponse(CalificacionSiniestroBase):
+    """Schema de respuesta de calificación de siniestro"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== INSTITUCIONES =====
+class InstitucionBase(BaseModel):
+    """Schema base de institución"""
+    nombre: str = Field(..., min_length=1, max_length=500)
+    codigo: Optional[str] = Field(None, max_length=50)
+    email: Optional[str] = Field(None, max_length=100)
+    activo: bool = True
+
+
+class InstitucionCreate(InstitucionBase):
+    """Schema para crear institución"""
+    pass
+
+
+class InstitucionUpdate(BaseModel):
+    """Schema para actualizar institución"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=200)
+    codigo: Optional[str] = Field(None, max_length=50)
+    email: Optional[str] = Field(None, max_length=100)
+    activo: Optional[bool] = None
+
+
+class InstitucionResponse(InstitucionBase):
+    """Schema de respuesta de institución"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== AUTORIDADES =====
+class AutoridadBase(BaseModel):
+    """Schema base de autoridad"""
+    nombre: str = Field(..., min_length=1, max_length=500)
+    codigo: Optional[str] = Field(None, max_length=50)
+    email: Optional[str] = Field(None, max_length=100)
+    activo: bool = True
+
+
+class AutoridadCreate(AutoridadBase):
+    """Schema para crear autoridad"""
+    pass
+
+
+class AutoridadUpdate(BaseModel):
+    """Schema para actualizar autoridad"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=200)
+    codigo: Optional[str] = Field(None, max_length=50)
+    email: Optional[str] = Field(None, max_length=100)
+    activo: Optional[bool] = None
+
+
+class AutoridadResponse(AutoridadBase):
+    """Schema de respuesta de autoridad"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== PROVENIENTES =====
+class ProvenienteBase(BaseModel):
+    """Schema base de proveniente"""
+    nombre: str = Field(..., min_length=1, max_length=200)
+    codigo: Optional[str] = Field(None, max_length=50)
+    telefono: Optional[str] = Field(None, max_length=20)
+    email: Optional[str] = Field(None, max_length=100)
+    direccion: Optional[str] = None
+    contacto_principal: Optional[str] = Field(None, max_length=100)
+    observaciones: Optional[str] = None
+    activo: bool = True
+
+
+class ProvenienteCreate(ProvenienteBase):
+    """Schema para crear proveniente"""
+    pass
+
+
+class ProvenienteUpdate(BaseModel):
+    """Schema para actualizar proveniente"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=200)
+    codigo: Optional[str] = Field(None, max_length=50)
+    telefono: Optional[str] = Field(None, max_length=20)
+    email: Optional[str] = Field(None, max_length=100)
+    direccion: Optional[str] = None
+    contacto_principal: Optional[str] = Field(None, max_length=100)
+    observaciones: Optional[str] = None
+    activo: Optional[bool] = None
+
+
+class ProvenienteResponse(ProvenienteBase):
+    """Schema de respuesta de proveniente"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== TIPOS DE DOCUMENTO =====
+class TipoDocumentoBase(BaseModel):
+    """Schema base de tipo de documento"""
+    nombre: str = Field(..., min_length=1, max_length=100)
+    descripcion: Optional[str] = None
+    area_id: Optional[UUID] = None
+    activo: bool = True
+
+
+class TipoDocumentoCreate(TipoDocumentoBase):
+    """Schema para crear tipo de documento"""
+    pass
+
+
+class TipoDocumentoUpdate(BaseModel):
+    """Schema para actualizar tipo de documento"""
+    nombre: Optional[str] = Field(None, min_length=1, max_length=100)
+    descripcion: Optional[str] = None
+    area_id: Optional[UUID] = None
+    activo: Optional[bool] = None
+
+
+class TipoDocumentoResponse(TipoDocumentoBase):
+    """Schema de respuesta de tipo de documento"""
+    id: UUID
+    empresa_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+    # Relación opcional con área
+    area: Optional[AreaResponse] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== SINIESTROS =====
+class SiniestroBase(BaseModel):
+    """Schema base de siniestro"""
+    numero_siniestro: str = Field(..., min_length=1, max_length=50)
+    fecha_siniestro: datetime
+    ubicacion: Optional[str] = None
+    descripcion_hechos: Optional[str] = Field(None, min_length=1)  # Opcional, se maneja en versiones
+    
+    # Información de póliza
+    numero_poliza: Optional[str] = Field(None, max_length=100)
+    deducible: Decimal = Field(Decimal("0.00"), ge=0)
+    reserva: Decimal = Field(Decimal("0.00"), ge=0)
+    coaseguro: Decimal = Field(Decimal("0.00"), ge=0)
+    suma_asegurada: Decimal = Field(Decimal("0.00"), ge=0)
+    
+    # Usuario asegurado (rol asegurado)
+    asegurado_id: Optional[UUID] = None
+    
+    # Estado del siniestro
+    estado_id: Optional[UUID] = None
+    
+    # Instituciones involucradas
+    institucion_id: Optional[UUID] = None
+    autoridad_id: Optional[UUID] = None
+    
+    # Proveniente y código
+    proveniente_id: Optional[UUID] = None
+    numero_reporte: Optional[str] = Field(None, max_length=100)
+    
+    # Calificación
+    calificacion_id: Optional[UUID] = None
+    
+    # Forma de contacto
+    forma_contacto: Optional[Literal["correo", "telefono", "directa"]] = None
+    
+    # Campos adicionales
+    prioridad: Literal["baja", "media", "alta", "critica"] = "media"
+    observaciones: Optional[str] = None
+    activo: bool = True
+
+
+class SiniestroCreate(SiniestroBase):
+    """Schema para crear siniestro"""
+    pass
+
+
+class SiniestroUpdate(BaseModel):
+    """Schema para actualizar siniestro"""
+    numero_siniestro: Optional[str] = Field(None, min_length=1, max_length=50)
+    fecha_siniestro: Optional[datetime] = None
+    ubicacion: Optional[str] = None
+    descripcion_hechos: Optional[str] = Field(None, min_length=1)
+    
+    # Información de póliza
+    numero_poliza: Optional[str] = Field(None, max_length=100)
+    deducible: Optional[Decimal] = Field(None, ge=0)
+    reserva: Optional[Decimal] = Field(None, ge=0)
+    coaseguro: Optional[Decimal] = Field(None, ge=0)
+    suma_asegurada: Optional[Decimal] = Field(None, ge=0)
+    
+    # Usuario asegurado (rol asegurado)
+    asegurado_id: Optional[UUID] = None
+    
+    # Estado del siniestro
+    estado_id: Optional[UUID] = None
+    
+    # Instituciones involucradas
+    institucion_id: Optional[UUID] = None
+    autoridad_id: Optional[UUID] = None
+    
+    # Proveniente y código
+    proveniente_id: Optional[UUID] = None
+    numero_reporte: Optional[str] = Field(None, max_length=100)
+    
+    # Calificación
+    calificacion_id: Optional[UUID] = None
+    
+    # Forma de contacto
+    forma_contacto: Optional[Literal["correo", "telefono", "directa"]] = None
+    
+    # Campos adicionales
+    prioridad: Optional[Literal["baja", "media", "alta", "critica"]] = None
+    observaciones: Optional[str] = None
+    activo: Optional[bool] = None
+
+
+class SiniestroResponse(SiniestroBase):
+    """Schema de respuesta de siniestro"""
+    id: UUID
+    empresa_id: UUID
+    creado_por: Optional[UUID] = None
+    asegurado_id: Optional[UUID] = None
+    codigo: Optional[str] = None  # Código generado automáticamente
+    fecha_registro: datetime
+    eliminado: bool
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== BITÁCORA DE ACTIVIDADES =====
+class BitacoraActividadBase(BaseModel):
+    """Schema base de bitácora de actividad"""
+    tipo_actividad: Literal["documento", "llamada", "reunion", "inspeccion", "otro"]
+    descripcion: str = Field(..., min_length=1)
+    horas_trabajadas: Decimal = Field(Decimal("0.00"), ge=0, le=24)
+    fecha_actividad: datetime
+    documento_adjunto: Optional[str] = Field(None, max_length=255)
+    comentarios: Optional[str] = None
+
+
+class BitacoraActividadCreate(BitacoraActividadBase):
+    """Schema para crear actividad en bitácora"""
+    siniestro_id: UUID
+    usuario_id: Optional[UUID] = None  # Se toma del usuario actual si no se especifica
+
+
+class BitacoraActividadUpdate(BaseModel):
+    """Schema para actualizar actividad en bitácora"""
+    tipo_actividad: Optional[Literal["documento", "llamada", "reunion", "inspeccion", "otro"]] = None
+    descripcion: Optional[str] = Field(None, min_length=1)
+    horas_trabajadas: Optional[Decimal] = Field(None, ge=0, le=24)
+    fecha_actividad: Optional[datetime] = None
+    documento_adjunto: Optional[str] = Field(None, max_length=255)
+    comentarios: Optional[str] = None
+
+
+class BitacoraActividadResponse(BitacoraActividadBase):
+    """Schema de respuesta de actividad en bitácora"""
+    id: UUID
+    siniestro_id: UUID
+    usuario_id: UUID
+    creado_en: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ===== DOCUMENTOS =====
+class DocumentoBase(BaseModel):
+    """Schema base de documento"""
+    nombre_archivo: str = Field(..., min_length=1, max_length=255)
+    ruta_archivo: str = Field(..., min_length=1, max_length=500)
+    tamaño_archivo: Optional[int] = None
+    tipo_mime: Optional[str] = Field(None, max_length=100)
+    descripcion: Optional[str] = None
+    fecha_documento: Optional[date] = None
+    es_principal: bool = False
+    es_adicional: bool = False
+    activo: bool = True
+
+
+class DocumentoCreate(DocumentoBase):
+    """Schema para crear documento"""
+    siniestro_id: UUID
+    tipo_documento_id: Optional[UUID] = None
+    etapa_flujo_id: Optional[UUID] = None
+    usuario_subio: Optional[UUID] = None
+    version: int = 1
+
+
+class DocumentoUpdate(BaseModel):
+    """Schema para actualizar documento"""
+    nombre_archivo: Optional[str] = Field(None, min_length=1, max_length=255)
+    descripcion: Optional[str] = None
+    fecha_documento: Optional[date] = None
+    es_principal: Optional[bool] = None
+    es_adicional: Optional[bool] = None
+    tipo_documento_id: Optional[UUID] = None
+    etapa_flujo_id: Optional[UUID] = None
+    activo: Optional[bool] = None
+
+
+class DocumentoResponse(DocumentoBase):
+    """Schema de respuesta de documento"""
+    id: UUID
+    siniestro_id: UUID
+    tipo_documento_id: Optional[UUID] = None
+    etapa_flujo_id: Optional[UUID] = None
+    usuario_subio: Optional[UUID] = None
+    version: int
+    eliminado: bool
+    creado_en: datetime
+    actualizado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== NOTIFICACIONES =====
+class NotificacionBase(BaseModel):
+    """Schema base de notificación"""
+    tipo: Literal["plazo_vencido", "cambio_estado", "asignacion", "recordatorio", "general"]
+    titulo: str = Field(..., min_length=1, max_length=200)
+    mensaje: str = Field(..., min_length=1)
+    fecha_vencimiento: Optional[datetime] = None
+
+
+class NotificacionCreate(NotificacionBase):
+    """Schema para crear notificación"""
+    usuario_id: UUID
+    siniestro_id: Optional[UUID] = None
+
+
+class NotificacionUpdate(BaseModel):
+    """Schema para actualizar notificación"""
+    leida: Optional[bool] = None
+    titulo: Optional[str] = Field(None, min_length=1, max_length=200)
+    mensaje: Optional[str] = Field(None, min_length=1)
+    fecha_vencimiento: Optional[datetime] = None
+
+
+class NotificacionResponse(NotificacionBase):
+    """Schema de respuesta de notificación"""
+    id: UUID
+    usuario_id: UUID
+    siniestro_id: Optional[UUID] = None
+    leida: bool
+    creado_en: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ===== EVIDENCIAS FOTOGRÁFICAS =====
+class EvidenciaFotograficaBase(BaseModel):
+    """Schema base de evidencia fotográfica"""
+    nombre_archivo: str = Field(..., min_length=1, max_length=255)
+    ruta_archivo: str = Field(..., min_length=1, max_length=500)
+    tamaño_archivo: Optional[int] = None
+    tipo_mime: Optional[str] = Field(None, max_length=100)
+    latitud: Optional[Decimal] = None
+    longitud: Optional[Decimal] = None
+    fecha_toma: Optional[datetime] = None
+    descripcion: Optional[str] = None
+    activo: bool = True
+
+
+class EvidenciaFotograficaCreate(EvidenciaFotograficaBase):
+    """Schema para crear evidencia fotográfica"""
+    siniestro_id: UUID
+    usuario_subio: Optional[UUID] = None
+
+
+class EvidenciaFotograficaUpdate(BaseModel):
+    """Schema para actualizar evidencia fotográfica"""
+    nombre_archivo: Optional[str] = Field(None, min_length=1, max_length=255)
+    descripcion: Optional[str] = None
+    latitud: Optional[Decimal] = None
+    longitud: Optional[Decimal] = None
+    fecha_toma: Optional[datetime] = None
+    activo: Optional[bool] = None
+
+
+class EvidenciaFotograficaResponse(EvidenciaFotograficaBase):
+    """Schema de respuesta de evidencia fotográfica"""
+    id: UUID
+    siniestro_id: UUID
+    usuario_subio: Optional[UUID] = None
+    eliminado: bool
+    creado_en: datetime
+    eliminado_en: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ===== RELACIONES SINIESTRO-USUARIO (INVOLUCRADOS) =====
+class SiniestroUsuarioBase(BaseModel):
+    """Schema base de relación siniestro-usuario"""
+    tipo_relacion: Literal["asegurado", "proveniente", "testigo", "tercero"]
+    es_principal: bool = False
+    observaciones: Optional[str] = None
+    activo: bool = True
+
+
+class SiniestroUsuarioCreate(SiniestroUsuarioBase):
+    """Schema para crear relación siniestro-usuario"""
+    siniestro_id: UUID
+    usuario_id: UUID
+
+
+class SiniestroUsuarioUpdate(BaseModel):
+    """Schema para actualizar relación siniestro-usuario"""
+    tipo_relacion: Optional[Literal["asegurado", "proveniente", "testigo", "tercero"]] = None
+    es_principal: Optional[bool] = None
+    observaciones: Optional[str] = None
+    activo: Optional[bool] = None
+
+
+class SiniestroUsuarioResponse(SiniestroUsuarioBase):
+    """Schema de respuesta de relación siniestro-usuario"""
+    id: UUID
+    siniestro_id: UUID
+    usuario_id: UUID
+    creado_en: datetime
+    actualizado_en: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ===== RELACIONES SINIESTRO-ÁREA =====
+class SiniestroAreaBase(BaseModel):
+    """Schema base de relación siniestro-área"""
+    observaciones: Optional[str] = None
+    activo: bool = True
+
+
+class SiniestroAreaCreate(SiniestroAreaBase):
+    """Schema para crear relación siniestro-área"""
+    siniestro_id: UUID
+    area_id: UUID
+    usuario_responsable: Optional[UUID] = None
+
+
+class SiniestroAreaUpdate(BaseModel):
+    """Schema para actualizar relación siniestro-área"""
+    usuario_responsable: Optional[UUID] = None
+    observaciones: Optional[str] = None
+    activo: Optional[bool] = None
+
+
+class SiniestroAreaResponse(SiniestroAreaBase):
+    """Schema de respuesta de relación siniestro-área"""
+    id: UUID
+    siniestro_id: UUID
+    area_id: UUID
+    usuario_responsable: Optional[UUID] = None
+    fecha_asignacion: datetime
+    creado_en: datetime
+    actualizado_en: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ===== VERSIONES DE DESCRIPCIÓN DE HECHOS =====
+class VersionesDescripcionHechosBase(BaseModel):
+    """Schema base de versión de descripción de hechos"""
+    descripcion_html: str = Field(..., min_length=1)
+    observaciones: Optional[str] = None
+
+
+class VersionesDescripcionHechosCreate(VersionesDescripcionHechosBase):
+    """Schema para crear versión de descripción de hechos"""
+    siniestro_id: UUID
+    observaciones: Optional[str] = None  # Notas sobre los cambios
+
+
+class VersionesDescripcionHechosUpdate(BaseModel):
+    """Schema para actualizar versión de descripción de hechos"""
+    observaciones: Optional[str] = None
+
+
+class VersionesDescripcionHechosResponse(VersionesDescripcionHechosBase):
+    """Schema de respuesta de versión de descripción de hechos"""
+    id: UUID
+    siniestro_id: UUID
+    version: int
+    es_actual: bool
+    creado_por: Optional[UUID] = None
+    creado_en: datetime
+    actualizado_en: datetime
+
+    class Config:
+        from_attributes = True
+

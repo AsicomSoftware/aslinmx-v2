@@ -1,42 +1,487 @@
 /**
-* Página del Dashboard (simplificada)
-* Solo muestra un mensaje de bienvenida
-*/
+ * Dashboard Principal
+ * Muestra métricas importantes y estadísticas del sistema con Highcharts
+ */
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import apiService from "@/lib/apiService";
+import { FiAlertTriangle, FiCheckCircle, FiClock, FiBarChart2, FiTrendingUp, FiUsers, FiFileText, FiBell } from "react-icons/fi";
+import { FaFileContract } from "react-icons/fa";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+
+interface DashboardStats {
+  total_siniestros: number;
+  siniestros_activos: number;
+  siniestros_criticos: number;
+  notificaciones_no_leidas: number;
+  actividades_recientes: number;
+  siniestros_por_estado: Array<{ nombre: string; cantidad: number }>;
+  siniestros_por_prioridad: Array<{ prioridad: string; cantidad: number }>;
+  siniestros_por_area: Array<{ nombre: string; cantidad: number }>;
+}
+
+interface RecentSiniestro {
+  id: string;
+  numero_siniestro: string;
+  fecha_siniestro: string;
+  prioridad: string;
+  estado_id?: string;
+  area_principal_id?: string;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user: currentUser, loading } = useUser();
+  const { user, loading } = useUser();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentSiniestros, setRecentSiniestros] = useState<RecentSiniestro[]>([]);
+  const [siniestrosByMonth, setSiniestrosByMonth] = useState<Array<{ mes: string; cantidad: number }>>([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [areas, setAreas] = useState<any[]>([]);
+  const [estados, setEstados] = useState<any[]>([]);
 
   useEffect(() => {
+    if (loading) return;
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (!token || !user) {
       router.push("/login");
+      return;
     }
-  }, [router]);
+    loadDashboardData();
+  }, [user, loading, router]);
 
-  if (loading) {
+  const loadDashboardData = async () => {
+    try {
+      setLoadingStats(true);
+      const [statsData, recentData, monthlyData, areasData, estadosData] = await Promise.all([
+        apiService.getDashboardStats(),
+        apiService.getRecentSiniestros(5),
+        apiService.getSiniestrosByMonth(6),
+        apiService.getAreas(true),
+        apiService.getEstadosSiniestro(true),
+      ]);
+      setStats(statsData);
+      setRecentSiniestros(recentData);
+      setSiniestrosByMonth(monthlyData);
+      setAreas(areasData);
+      setEstados(estadosData);
+    } catch (e: any) {
+      if (e.response?.status === 401) {
+        router.push("/login");
+        return;
+      }
+      console.error("Error al cargar datos del dashboard:", e);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  const prioridadColors: Record<string, string> = {
+    baja: "bg-green-100 text-green-800",
+    media: "bg-yellow-100 text-yellow-800",
+    alta: "bg-orange-100 text-orange-800",
+    critica: "bg-red-100 text-red-800",
+  };
+
+  const getAreaNombre = (areaId?: string) => {
+    if (!areaId) return "Sin área";
+    const area = areas.find((a) => a.id === areaId);
+    return area?.nombre || "N/A";
+  };
+
+  const getEstadoNombre = (estadoId?: string) => {
+    if (!estadoId) return "Sin estado";
+    const estado = estados.find((e) => e.id === estadoId);
+    return estado?.nombre || "N/A";
+  };
+
+  // Configuración del gráfico de barras para Estados
+  const estadosChartOptions: Highcharts.Options = {
+    chart: {
+      type: "column",
+      height: 300,
+    },
+    title: {
+      text: undefined,
+    },
+    xAxis: {
+      categories: stats?.siniestros_por_estado.map((item) => item.nombre) || [],
+      title: {
+        text: "Estados",
+      },
+    },
+    yAxis: {
+      title: {
+        text: "Cantidad",
+      },
+    },
+    series: [
+      {
+        name: "Siniestros",
+        type: "column",
+        data: stats?.siniestros_por_estado.map((item) => item.cantidad) || [],
+        color: "#0A2E5C",
+      },
+    ],
+    legend: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
+    },
+    plotOptions: {
+      column: {
+        borderRadius: 4,
+        dataLabels: {
+          enabled: true,
+        },
+      },
+    },
+  };
+
+  // Configuración del gráfico de barras para Prioridades
+  const prioridadesChartOptions: Highcharts.Options = {
+    chart: {
+      type: "bar",
+      height: 300,
+    },
+    title: {
+      text: undefined,
+    },
+    xAxis: {
+      categories: stats?.siniestros_por_prioridad.map((item) => item.prioridad.toUpperCase()) || [],
+      title: {
+        text: "Prioridades",
+      },
+    },
+    yAxis: {
+      title: {
+        text: "Cantidad",
+      },
+    },
+    series: [
+      {
+        name: "Siniestros",
+        type: "bar",
+        data:
+          stats?.siniestros_por_prioridad.map((item) => ({
+            y: item.cantidad,
+            color:
+              item.prioridad === "critica"
+                ? "#DC2626"
+                : item.prioridad === "alta"
+                ? "#EA580C"
+                : item.prioridad === "media"
+                ? "#EAB308"
+                : "#22C55E",
+          })) || [],
+      },
+    ],
+    legend: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        dataLabels: {
+          enabled: true,
+        },
+      },
+    },
+  };
+
+  // Configuración del gráfico de dona para Áreas
+  const areasChartOptions: Highcharts.Options = {
+    chart: {
+      type: "pie",
+      height: 300,
+    },
+    title: {
+      text: undefined,
+    },
+    tooltip: {
+      pointFormat: "{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)",
+    },
+    plotOptions: {
+      pie: {
+        allowPointSelect: true,
+        cursor: "pointer",
+        dataLabels: {
+          enabled: true,
+          format: "<b>{point.name}</b>: {point.y}",
+        },
+        innerSize: "50%",
+      },
+    },
+    series: [
+      {
+        name: "Siniestros",
+        type: "pie",
+        data:
+          stats?.siniestros_por_area.map((item) => ({
+            name: item.nombre,
+            y: item.cantidad,
+          })) || [],
+      },
+    ],
+    credits: {
+      enabled: false,
+    },
+  };
+
+  // Configuración del gráfico de líneas para Siniestros por Mes
+  const mesesChartOptions: Highcharts.Options = {
+    chart: {
+      type: "line",
+      height: 300,
+    },
+    title: {
+      text: undefined,
+    },
+    xAxis: {
+      categories: siniestrosByMonth.map((item) => item.mes) || [],
+      title: {
+        text: "Mes",
+      },
+    },
+    yAxis: {
+      title: {
+        text: "Cantidad",
+      },
+    },
+    series: [
+      {
+        name: "Siniestros",
+        type: "line",
+        data: siniestrosByMonth.map((item) => item.cantidad) || [],
+        color: "#0A2E5C",
+        marker: {
+          radius: 6,
+        },
+      },
+    ],
+    legend: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
+    },
+    plotOptions: {
+      line: {
+        dataLabels: {
+          enabled: true,
+        },
+      },
+    },
+  };
+
+  if (loading || loadingStats || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Cargando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="text-gray-600">No se pudieron cargar las estadísticas</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {`Bienvenido${currentUser ? `, ${currentUser.full_name || currentUser.email}` : ""} 👋`}
-        </h1>
-        <p className="mt-2 text-gray-600">Nos alegra verte de nuevo.</p>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-sm text-gray-600">Bienvenido, {user?.full_name || user?.email}</p>
+        </div>
+        <button
+          onClick={loadDashboardData}
+          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+        >
+          Actualizar
+        </button>
+      </div>
+
+      {/* Métricas principales */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          title="Total Siniestros"
+          value={stats.total_siniestros}
+          icon={<FaFileContract className="w-6 h-6" />}
+          color="bg-blue-500"
+        />
+        <MetricCard
+          title="Siniestros Activos"
+          value={stats.siniestros_activos}
+          icon={<FiCheckCircle className="w-6 h-6" />}
+          color="bg-green-500"
+        />
+        <MetricCard
+          title="Siniestros Críticos"
+          value={stats.siniestros_criticos}
+          icon={<FiAlertTriangle className="w-6 h-6" />}
+          color="bg-red-500"
+        />
+        <MetricCard
+          title="Notificaciones"
+          value={stats.notificaciones_no_leidas}
+          icon={<FiBell className="w-6 h-6" />}
+          color="bg-yellow-500"
+        />
+      </div>
+
+      {/* Gráficos principales */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Siniestros por Estado - Gráfico de Barras */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiBarChart2 className="w-5 h-5" />
+            Siniestros por Estado
+          </h3>
+          {stats.siniestros_por_estado.length > 0 ? (
+            <HighchartsReact highcharts={Highcharts} options={estadosChartOptions} />
+          ) : (
+            <p className="text-gray-500 text-sm">No hay datos disponibles</p>
+          )}
+        </div>
+
+        {/* Siniestros por Prioridad - Gráfico de Barras Horizontal */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiTrendingUp className="w-5 h-5" />
+            Siniestros por Prioridad
+          </h3>
+          {stats.siniestros_por_prioridad.length > 0 ? (
+            <HighchartsReact highcharts={Highcharts} options={prioridadesChartOptions} />
+          ) : (
+            <p className="text-gray-500 text-sm">No hay datos disponibles</p>
+          )}
+        </div>
+      </div>
+
+      {/* Gráficos secundarios */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Siniestros por Área - Gráfico de Dona */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiUsers className="w-5 h-5" />
+            Siniestros por Área
+          </h3>
+          {stats.siniestros_por_area.length > 0 ? (
+            <HighchartsReact highcharts={Highcharts} options={areasChartOptions} />
+          ) : (
+            <p className="text-gray-500 text-sm">No hay datos disponibles</p>
+          )}
+        </div>
+
+        {/* Siniestros por Mes - Gráfico de Líneas */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiTrendingUp className="w-5 h-5" />
+            Siniestros por Mes (últimos 6 meses)
+          </h3>
+          {siniestrosByMonth.length > 0 ? (
+            <HighchartsReact highcharts={Highcharts} options={mesesChartOptions} />
+          ) : (
+            <p className="text-gray-500 text-sm">No hay datos disponibles</p>
+          )}
+        </div>
+      </div>
+
+      {/* Siniestros Recientes y Actividades */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Siniestros Recientes */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiClock className="w-5 h-5" />
+            Siniestros Recientes
+          </h3>
+          {recentSiniestros.length > 0 ? (
+            <div className="space-y-3">
+              {recentSiniestros.map((siniestro) => (
+                <div
+                  key={siniestro.id}
+                  className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => router.push(`/siniestros/${siniestro.id}`)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-sm">{siniestro.numero_siniestro}</span>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        prioridadColors[siniestro.prioridad] || "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {siniestro.prioridad.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <div>Estado: {getEstadoNombre(siniestro.estado_id)}</div>
+                    <div>Área: {getAreaNombre(siniestro.area_principal_id)}</div>
+                    {siniestro.fecha_siniestro && (
+                      <div>Fecha: {new Date(siniestro.fecha_siniestro).toLocaleDateString("es-MX")}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm">No hay siniestros recientes</p>
+          )}
+        </div>
+
+        {/* Actividades Recientes */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiFileText className="w-5 h-5" />
+            Actividades Recientes (últimas 24 horas)
+          </h3>
+          <div className="text-center py-8">
+            <p className="text-3xl font-bold text-primary-600">{stats.actividades_recientes}</p>
+            <p className="text-sm text-gray-600 mt-2">Actividades registradas en bitácora</p>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
+function MetricCard({
+  title,
+  value,
+  icon,
+  color,
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+}) {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+        </div>
+        <div className={`${color} text-white p-4 rounded-lg`}>{icon}</div>
+      </div>
+    </div>
+  );
+}
